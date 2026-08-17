@@ -1,0 +1,22 @@
+{
+  "blocks": {
+    "fingerprint-1": {
+      "createdAt": "0001-01-01T00:00:01Z",
+      "disabled": false,
+      "name": "fingerprint-1",
+      "version": "latest"
+    },
+    "prettier-3": {
+      "createdAt": "2026-07-15T20:59:54.627804904Z",
+      "disabled": false,
+      "name": "prettier-3",
+      "version": "latest"
+    },
+    "validate-1": {
+      "createdAt": "0001-01-01T00:00:01Z",
+      "disabled": false,
+      "name": "validate-1",
+      "version": "latest"
+    }
+  }
+}

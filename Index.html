@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Score Check</title>
+    
+    <style>
+        /* Ajuste do Corpo da Página para ocupar tudo e ter Cabeçalho/Rodapé */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- NOVO: Barra de Navegação (Cabeçalho) --- */
+        .navbar {
+            background-color: #005be4;
+            color: white;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .user-profile {
+            font-size: 14px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        /* Área central que preenche a tela */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* --- NOVO: Rodapé --- */
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #777;
+            font-size: 13px;
+        }
+
+        /* Container da Calculadora (Seu design original mantido) */
+        .container {
+            background-color: #ffffff;
+            padding: 35px 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 91, 228, 0.15);
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+            border-top: 5px solid #005be4;
+        }
+
+        h2 {
+            color: #005be4;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 26px;
+            font-weight: 800;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #444;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5eb;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #005be4;
+            box-shadow: 0 0 0 4px rgba(0, 91, 228, 0.15);
+        }
+
+        .btn-principal {
+            background-color: #005be4;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .btn-principal:hover { background-color: #0046b3; }
+        .btn-principal:active { transform: scale(0.98); }
+
+        .resultado-box {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none; 
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .show { display: block; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .danger { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* --- NOVO: Estilos do Modal de Boas-Vindas --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* Escurece o fundo */
+            backdrop-filter: blur(4px); /* Desfoca o fundo profissionalmente */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.escondido {
+            opacity: 0;
+            pointer-events: none; /* Desativa o clique quando invisível */
+        }
+
+        .modal-box {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            position: relative;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.escondido .modal-box {
+            transform: translateY(-20px); /* Efeito de subidinha ao fechar */
+        }
+
+        .modal-box h3 {
+            margin-top: 0;
+            color: #005be4;
+            font-size: 24px;
+        }
+
+        .modal-box p {
+            color: #555;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        /* Botão de Fechar no canto (O X) */
+        .fechar-x {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .fechar-x:hover {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MODAL DE BOAS VINDAS (O Aviso) -->
+    <div id="avisoModal" class="modal-overlay">
+        <div class="modal-box">
+            <!-- Botão de Fechar X -->
+            <button class="fechar-x" id="btnFecharX">&times;</button>
+            
+            <h3>Bem-vindo ao Score Check! 📊</h3>
+            <p>Este sistema permite que você avalie rapidamente o desempenho dos alunos.</p>
+            <p style="text-align: left; background: #f0f2f5; padding: 15px; border-radius: 8px;">
+                ✅ <b>Aprovado:</b> Nota 6.0 ou superior.<br>
+                ⚠️ <b>Recuperação:</b> Nota entre 4.0 e 5.9.<br>
+                ❌ <b>Reprovado:</b> Nota menor que 4.0.
+            </p>
+            
+            <button class="btn-principal" id="btnEntendi">Entendi, começar!</button>
+        </div>
+    </div>
+
+    <!-- CABEÇALHO DO APLICATIVO -->
+    <header class="navbar">
+        <h1>Score Check</h1>
+        <div class="user-profile">👨‍🏫 Ambiente do Professor</div>
+    </header>
+
+    <!-- ÁREA CENTRAL COM A CALCULADORA -->
+    <main class="main-content">
+        <div class="container">
+            <h2>Avaliação</h2>
+            
+            <div class="input-group">
+                <label for="entrada_nota">Digite a nota do aluno:</label>
+                <input type="number" id="entrada_nota" step="0.1" placeholder="Ex: 7.5">
+            </div>
+            
+            <button class="btn-principal" id="botao_avaliar">Avaliar Nota</button>
+            
+            <div id="resultado" class="resultado-box"></div>
+        </div>
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="footer">
+        &copy; 2026 Score Check - Sistema de Aprovação Profissional
+    </footer>
+
+    <!-- LÓGICA DO JAVASCRIPT -->
+    <script>
+        // Lógica para o Modal (O Aviso)
+        const modal = document.getElementById('avisoModal');
+        const btnFecharX = document.getElementById('btnFecharX');
+        const btnEntendi = document.getElementById('btnEntendi');
+
+        function fecharModal() {
+            modal.classList.add('escondido');
+        }
+
+        // Fechar ao clicar no X ou no Botão
+        btnFecharX.addEventListener('click', fecharModal);
+        btnEntendi.addEventListener('click', fecharModal);
+
+        // Lógica da Calculadora de Notas
+        document.getElementById('botao_avaliar').addEventListener('click', function() {
+            const inputElement = document.getElementById('entrada_nota');
+            const valorInput = inputElement.value;
+            const resultadoDiv = document.getElementById('resultado');
+
+            resultadoDiv.className = 'resultado-box show';
+
+            if (valorInput === '') {
+                resultadoDiv.classList.add('error');
+                resultadoDiv.innerHTML = "Resultado:<br>Por favor, digite um número válido.";
+                return;
+            }
+
+            const nota = parseFloat(valorInput);
+
+            if (nota < 0 || nota > 10) {
+                resultadoDiv.classList.add('error');
+                resultadoDiv.innerHTML = "Resultado:<br>Esta nota não pode ser aplicada, tem que estar entre 0 a 10.";
+                return;
+            }
+
+            let htmlResultado = `Nota: ${nota}<br><br>Resultado:<br>`;
+
+            if (nota >= 6) {
+                resultadoDiv.classList.add('success');
+                htmlResultado += "✅ Aprovado";
+            } else if (nota >= 4) {
+                resultadoDiv.classList.add('warning');
+                htmlResultado += "⚠️ Recuperação";
+            } else {
+                resultadoDiv.classList.add('danger');
+                htmlResultado += "❌ Reprovado";
+            }
+
+            resultadoDiv.innerHTML = htmlResultado;
+        });
+    </script>
+</body>
+</html>
